@@ -2,31 +2,48 @@ const express = require('express');
 const router = express.Router();
 const postsService = require('../service/postsService')
 
-router.get('/posts', async function (req, res)
+router.get('/posts', async function (req, res, next)
 {
-    const posts = await postsService.getPosts();
-    res.json(posts)
+    try {
+        const posts = await postsService.getPosts();
+        res.json(posts);
+
+    } catch (error) {
+        next(error);
+    }
 });
 
-
-router.post('/posts', async function (req, res)
+router.post('/posts', async function (req, res, next)
 {
     const post = req.body;
-    const newPost = await postsService.savePost(post);
-    res.json(newPost);
+    try {
+        const newPost = await postsService.savePost(post);
+        res.status(201).json(newPost);
+    } catch (error) {
+        next(error)
+    }
 });
 
-router.put('/posts/:id', async function (req, res)
+router.put('/posts/:id', async function (req, res, next)
 {
     const post = req.body;
-    await postsService.updatePost(req.params.id, post);
-    res.end();
+    try {
+        await postsService.updatePost(req.params.id, post);
+        res.status(204).end();
+    } catch (error) {
+        next(error)
+    }
 });
 
-router.delete('/posts/:id', async function (req, res)
+router.delete('/posts/:id', async function (req, res, next)
 {
-    await postsService.deletePost(req.params.id);
-    res.end();
+    try {
+        await postsService.deletePost(req.params.id);
+        res.status(204).end();
+    } catch (error) {
+        next(error);
+    }
 })
+
 
 module.exports = router
